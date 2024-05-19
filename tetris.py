@@ -251,8 +251,6 @@ class BlocksGroup(pygame.sprite.OrderedUpdates):
         self.next_block = None
         # Not really moving, just to initialize the attribute.
         self.stop_moving_current_block()
-        # The first block.
-        self._create_new_block()
 
     def _check_line_completion(self):
         """
@@ -435,13 +433,13 @@ def main():
     EVENT_UPDATE_CURRENT_BLOCK = pygame.USEREVENT + 1
     EVENT_MOVE_CURRENT_BLOCK = pygame.USEREVENT + 2
     EVENT_UPDATE_DIFF2 = pygame.USEREVENT + 3
-    EVENT_UPDATE_DIFF3 = pygame.USEREVENT + 5
+    EVENT_UPDATE_DIFF3 = pygame.USEREVENT + 4
     # Speed at which blocks update and move
     # Lower number means faster
     pygame.time.set_timer(EVENT_UPDATE_CURRENT_BLOCK, 1000)
     pygame.time.set_timer(EVENT_MOVE_CURRENT_BLOCK, 80)
     pygame.time.set_timer(EVENT_UPDATE_DIFF2, 500)
-    pygame.time.set_timer(EVENT_UPDATE_DIFF3, 300)
+    pygame.time.set_timer(EVENT_UPDATE_DIFF3, 200)
 
     blocks = BlocksGroup()
 
@@ -452,8 +450,18 @@ def main():
             if not game_start:
                 if event.type == pygame.KEYUP and event.key == pygame.K_s:
                     game_start = True
+                    #* Starts a new game
+                    if game_over:
+                        game_over = False
+                        blocks = BlocksGroup()
+                    blocks._create_new_block()
                 elif event.type == pygame.QUIT:
                     run = False
+                    break
+                elif event.type == pygame.KEYUP and event.key == pygame.K_q:
+                    run = False
+                    break
+                
                 continue
             
             if paused and event.type == pygame.KEYUP and event.key == pygame.K_q:
@@ -482,46 +490,27 @@ def main():
 
             try:
                 #* Need to coincide with the update periods 
-                #* curr difficulties have periods 1000, 500, 300
-                # (so multiples of 5, 10, 3)
-                #! Controls get extremely twichy at DIFF 2 & 3. 
-                #! May need to make the move events slower
-                #! Has error for diff 3
+                #* curr difficulties have periods 1000, 500, 200
+                # (so multiples of 5, 10, 2)
                 
                 if event.type == EVENT_MOVE_CURRENT_BLOCK:
                     blocks.move_current_block()
                 else:
-                    if score < 20:
+                    if score < 40:
                         if event.type == EVENT_UPDATE_CURRENT_BLOCK:
                             blocks.update_current_block()
-                    elif score < 60:
+                    elif score < 80:
                         if event.type == EVENT_UPDATE_DIFF2:
                             blocks.update_current_block()
                     else:
                         if event.type == EVENT_UPDATE_DIFF3:
                             blocks.update_current_block()
                 
-                # if score < 40:
-                #     if event.type == EVENT_UPDATE_CURRENT_BLOCK:
-                #         blocks.update_current_block()
-                #     elif event.type == EVENT_MOVE_CURRENT_BLOCK:
-                #         blocks.move_current_block()
-                # elif score < 90:   #* Can also be 90
-                #     if event.type == EVENT_UPDATE_DIFF2:
-                #         blocks.update_current_block()
-                #     elif event.type == EVENT_MOVE_DIFF2:
-                #         blocks.move_current_block()
-                # else:
-                #     if event.type == EVENT_UPDATE_DIFF3:
-                #         blocks.update_current_block()
-                #     elif event.type == EVENT_MOVE_DIFF3:
-                #         blocks.move_current_block()
             except TopReached:
                 game_over = True
 
         # Draw background and grid.
-        screen.blit(background, (0, 0))
-        # Blocks.
+        screen.blit(background, (0, 0))        
         blocks.draw(screen)
         
         # Sidebar with misc. information.
@@ -529,6 +518,7 @@ def main():
         # rgb(255, 220, 0)
         next_block_text = font.render("Next figure:", True, (255, 255, 255), bgcolor)
         game_over_text = font_game_over.render("|Game over!|", True, (255, 220, 0), bgcolor)
+        
         if game_start:
             if not paused:
                 inst_text = font.render("(P) to pause", True, (255, 255, 255), bgcolor)
@@ -539,22 +529,29 @@ def main():
             inst_text3 = font.render("← and → to move", True, (255, 255, 255), bgcolor)
             inst_text4 = font.render("↓ to drop quickly", True, (255, 255, 255), bgcolor)
         else:
-            inst_text = font.render("Press (S) to start", True, (255, 255, 255), bgcolor)
+            if not game_over:
+                inst_text = font.render("Press (S) to start", True, (255, 255, 255), bgcolor)
+                inst_text2 = font.render("Press (Q) to Quit", True, (255, 255, 255), bgcolor)
+            else:
+                inst_text = font.render("(S) for new game", True, (255, 255, 255), bgcolor)
+                inst_text2 = font.render("Press (Q) to Quit", True, (255, 255, 255), bgcolor)
         
         score_text = font.render(f"Score: {blocks.score}", True, (255, 255, 255), bgcolor)    
         score = blocks.score
-        draw_centered_surface(screen, next_block_text, 50)
-        draw_centered_surface(screen, blocks.next_block.image, 100)
         
         draw_centered_surface(screen, score_text, 240)
         draw_centered_surface(screen, inst_text, 280)
+        draw_centered_surface(screen, inst_text2, 310)
         if game_start:
+            draw_centered_surface(screen, blocks.next_block.image, 100)
+            draw_centered_surface(screen, next_block_text, 50)
+            
             # Current font size 20, so should be enough
-            draw_centered_surface(screen, inst_text2, 310)
             draw_centered_surface(screen, inst_text3, 340)
             draw_centered_surface(screen, inst_text4, 370)
         if game_over:
             draw_centered_surface(screen, game_over_text, 360)
+            game_start = False
         # Update.
         pygame.display.flip()
 
