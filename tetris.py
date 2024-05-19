@@ -72,12 +72,14 @@ class Block(pygame.sprite.Sprite):
             # rgb(41, 130, 217),
             # rgb(217, 170, 41)
             # rgb(214, 25, 25)
+            # rgb(235, 130, 130)
             (255, 255, 255),
             (201, 64, 184),
             (44, 166, 49),
             (41, 130, 217),
             (217, 170, 41),
-            (214, 25, 25)
+            (214, 25, 25),
+            (235, 130, 130)
         ))
         self.current = True
         self.struct = np.array(self.struct)
@@ -400,7 +402,7 @@ def draw_grid(background):
 
 
 def draw_centered_surface(screen, surface, y):
-    screen.blit(surface, (400 - surface.get_width()//2, y))
+    screen.blit(surface, (450 - surface.get_width()//2, y))
 
 
 def main():
@@ -411,6 +413,7 @@ def main():
     paused = False
     game_start = False
     game_over = False
+    score = 0
     
     # Create background.
     background = pygame.Surface(screen.get_size())
@@ -431,9 +434,13 @@ def main():
     MOVEMENT_KEYS = pygame.K_LEFT, pygame.K_RIGHT, pygame.K_DOWN
     EVENT_UPDATE_CURRENT_BLOCK = pygame.USEREVENT + 1
     EVENT_MOVE_CURRENT_BLOCK = pygame.USEREVENT + 2
+    EVENT_UPDATE_DIFF2 = pygame.USEREVENT + 3
+    EVENT_MOVE_DIFF2 = pygame.USEREVENT + 4
     # Speed at which blocks update and move
     pygame.time.set_timer(EVENT_UPDATE_CURRENT_BLOCK, 1000)
     pygame.time.set_timer(EVENT_MOVE_CURRENT_BLOCK, 100)
+    pygame.time.set_timer(EVENT_UPDATE_DIFF2, 500)
+    pygame.time.set_timer(EVENT_MOVE_DIFF2, 50)
 
     blocks = BlocksGroup()
 
@@ -473,10 +480,18 @@ def main():
                     blocks.start_moving_current_block(event.key)
 
             try:
-                if event.type == EVENT_UPDATE_CURRENT_BLOCK:
-                    blocks.update_current_block()
-                elif event.type == EVENT_MOVE_CURRENT_BLOCK:
-                    blocks.move_current_block()
+                #* Need to coincide with the update periods 
+                # (so multiples of 5 and 10)
+                if score < 40:
+                    if event.type == EVENT_UPDATE_CURRENT_BLOCK:
+                        blocks.update_current_block()
+                    elif event.type == EVENT_MOVE_CURRENT_BLOCK:
+                        blocks.move_current_block()
+                else:
+                    if event.type == EVENT_UPDATE_DIFF2:
+                        blocks.update_current_block()
+                    elif event.type == EVENT_MOVE_DIFF2:
+                        blocks.move_current_block()
             except TopReached:
                 game_over = True
 
@@ -503,7 +518,7 @@ def main():
             inst_text = font.render("Press (S) to start", True, (255, 255, 255), bgcolor)
         
         score_text = font.render(f"Score: {blocks.score}", True, (255, 255, 255), bgcolor)    
-        
+        score = blocks.score
         draw_centered_surface(screen, next_block_text, 50)
         draw_centered_surface(screen, blocks.next_block.image, 100)
         
