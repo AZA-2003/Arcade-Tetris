@@ -72,12 +72,14 @@ class Block(pygame.sprite.Sprite):
             # rgb(41, 130, 217),
             # rgb(217, 170, 41)
             # rgb(214, 25, 25)
+            # rgb(235, 130, 130)
             (255, 255, 255),
             (201, 64, 184),
             (44, 166, 49),
             (41, 130, 217),
             (217, 170, 41),
-            (214, 25, 25)
+            (214, 25, 25),
+            (235, 130, 130)
         ))
         self.current = True
         self.struct = np.array(self.struct)
@@ -400,7 +402,7 @@ def draw_grid(background):
 
 
 def draw_centered_surface(screen, surface, y):
-    screen.blit(surface, (400 - surface.get_width()//2, y))
+    screen.blit(surface, (450 - surface.get_width()//2, y))
 
 
 def main():
@@ -411,6 +413,7 @@ def main():
     paused = False
     game_start = False
     game_over = False
+    score = 0
     
     # Create background.
     background = pygame.Surface(screen.get_size())
@@ -431,9 +434,14 @@ def main():
     MOVEMENT_KEYS = pygame.K_LEFT, pygame.K_RIGHT, pygame.K_DOWN
     EVENT_UPDATE_CURRENT_BLOCK = pygame.USEREVENT + 1
     EVENT_MOVE_CURRENT_BLOCK = pygame.USEREVENT + 2
+    EVENT_UPDATE_DIFF2 = pygame.USEREVENT + 3
+    EVENT_UPDATE_DIFF3 = pygame.USEREVENT + 5
     # Speed at which blocks update and move
+    # Lower number means faster
     pygame.time.set_timer(EVENT_UPDATE_CURRENT_BLOCK, 1000)
-    pygame.time.set_timer(EVENT_MOVE_CURRENT_BLOCK, 100)
+    pygame.time.set_timer(EVENT_MOVE_CURRENT_BLOCK, 80)
+    pygame.time.set_timer(EVENT_UPDATE_DIFF2, 500)
+    pygame.time.set_timer(EVENT_UPDATE_DIFF3, 300)
 
     blocks = BlocksGroup()
 
@@ -465,7 +473,7 @@ def main():
                     paused = not paused
 
             # Stop moving blocks if the game is over or paused.
-            if game_over or paused:                
+            if game_over or paused:
                 continue
 
             if event.type == pygame.KEYDOWN:
@@ -473,10 +481,41 @@ def main():
                     blocks.start_moving_current_block(event.key)
 
             try:
-                if event.type == EVENT_UPDATE_CURRENT_BLOCK:
-                    blocks.update_current_block()
-                elif event.type == EVENT_MOVE_CURRENT_BLOCK:
+                #* Need to coincide with the update periods 
+                #* curr difficulties have periods 1000, 500, 300
+                # (so multiples of 5, 10, 3)
+                #! Controls get extremely twichy at DIFF 2 & 3. 
+                #! May need to make the move events slower
+                #! Has error for diff 3
+                
+                if event.type == EVENT_MOVE_CURRENT_BLOCK:
                     blocks.move_current_block()
+                else:
+                    if score < 20:
+                        if event.type == EVENT_UPDATE_CURRENT_BLOCK:
+                            blocks.update_current_block()
+                    elif score < 60:
+                        if event.type == EVENT_UPDATE_DIFF2:
+                            blocks.update_current_block()
+                    else:
+                        if event.type == EVENT_UPDATE_DIFF3:
+                            blocks.update_current_block()
+                
+                # if score < 40:
+                #     if event.type == EVENT_UPDATE_CURRENT_BLOCK:
+                #         blocks.update_current_block()
+                #     elif event.type == EVENT_MOVE_CURRENT_BLOCK:
+                #         blocks.move_current_block()
+                # elif score < 90:   #* Can also be 90
+                #     if event.type == EVENT_UPDATE_DIFF2:
+                #         blocks.update_current_block()
+                #     elif event.type == EVENT_MOVE_DIFF2:
+                #         blocks.move_current_block()
+                # else:
+                #     if event.type == EVENT_UPDATE_DIFF3:
+                #         blocks.update_current_block()
+                #     elif event.type == EVENT_MOVE_DIFF3:
+                #         blocks.move_current_block()
             except TopReached:
                 game_over = True
 
@@ -503,7 +542,7 @@ def main():
             inst_text = font.render("Press (S) to start", True, (255, 255, 255), bgcolor)
         
         score_text = font.render(f"Score: {blocks.score}", True, (255, 255, 255), bgcolor)    
-        
+        score = blocks.score
         draw_centered_surface(screen, next_block_text, 50)
         draw_centered_surface(screen, blocks.next_block.image, 100)
         
