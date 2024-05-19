@@ -251,16 +251,6 @@ class BlocksGroup(pygame.sprite.OrderedUpdates):
         self.next_block = None
         # Not really moving, just to initialize the attribute.
         self.stop_moving_current_block()
-        # The first block.
-        # self._create_new_block()
-
-    def reset_game(self):
-        self._reset_grid()
-        self._ignore_next_stop = False
-        self.score = 0
-        self.next_block = None
-        # Not really moving, just to initialize the attribute.
-        self.stop_moving_current_block()
 
     def _check_line_completion(self):
         """
@@ -443,7 +433,7 @@ def main():
     EVENT_UPDATE_CURRENT_BLOCK = pygame.USEREVENT + 1
     EVENT_MOVE_CURRENT_BLOCK = pygame.USEREVENT + 2
     EVENT_UPDATE_DIFF2 = pygame.USEREVENT + 3
-    EVENT_UPDATE_DIFF3 = pygame.USEREVENT + 5
+    EVENT_UPDATE_DIFF3 = pygame.USEREVENT + 4
     # Speed at which blocks update and move
     # Lower number means faster
     pygame.time.set_timer(EVENT_UPDATE_CURRENT_BLOCK, 1000)
@@ -471,6 +461,7 @@ def main():
                 elif event.type == pygame.KEYUP and event.key == pygame.K_q:
                     run = False
                     break
+                
                 continue
             
             if paused and event.type == pygame.KEYUP and event.key == pygame.K_q:
@@ -500,10 +491,7 @@ def main():
             try:
                 #* Need to coincide with the update periods 
                 #* curr difficulties have periods 1000, 500, 200
-                # (so multiples of 5, 10, 3)
-                #! Controls get extremely twichy at DIFF 2 & 3. 
-                #! May need to make the move events slower
-                #! Has error for diff 3
+                # (so multiples of 5, 10, 2)
                 
                 if event.type == EVENT_MOVE_CURRENT_BLOCK:
                     blocks.move_current_block()
@@ -518,27 +506,11 @@ def main():
                         if event.type == EVENT_UPDATE_DIFF3:
                             blocks.update_current_block()
                 
-                # if score < 40:
-                #     if event.type == EVENT_UPDATE_CURRENT_BLOCK:
-                #         blocks.update_current_block()
-                #     elif event.type == EVENT_MOVE_CURRENT_BLOCK:
-                #         blocks.move_current_block()
-                # elif score < 90:   #* Can also be 90
-                #     if event.type == EVENT_UPDATE_DIFF2:
-                #         blocks.update_current_block()
-                #     elif event.type == EVENT_MOVE_DIFF2:
-                #         blocks.move_current_block()
-                # else:
-                #     if event.type == EVENT_UPDATE_DIFF3:
-                #         blocks.update_current_block()
-                #     elif event.type == EVENT_MOVE_DIFF3:
-                #         blocks.move_current_block()
             except TopReached:
                 game_over = True
 
         # Draw background and grid.
-        screen.blit(background, (0, 0))
-        # Blocks.
+        screen.blit(background, (0, 0))        
         blocks.draw(screen)
         
         # Sidebar with misc. information.
@@ -546,6 +518,7 @@ def main():
         # rgb(255, 220, 0)
         next_block_text = font.render("Next figure:", True, (255, 255, 255), bgcolor)
         game_over_text = font_game_over.render("|Game over!|", True, (255, 220, 0), bgcolor)
+        
         if game_start:
             if not paused:
                 inst_text = font.render("(P) to pause", True, (255, 255, 255), bgcolor)
