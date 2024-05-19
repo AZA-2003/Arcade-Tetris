@@ -455,6 +455,10 @@ def main():
                     blocks._create_new_block()
                 elif event.type == pygame.QUIT:
                     run = False
+                    break
+                elif event.type == pygame.KEYUP and event.key == pygame.K_q:
+                    run = False
+                    break
                 continue
             
             if paused and event.type == pygame.KEYUP and event.key == pygame.K_q:
