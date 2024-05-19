@@ -254,6 +254,14 @@ class BlocksGroup(pygame.sprite.OrderedUpdates):
         # The first block.
         # self._create_new_block()
 
+    def reset_game(self):
+        self._reset_grid()
+        self._ignore_next_stop = False
+        self.score = 0
+        self.next_block = None
+        # Not really moving, just to initialize the attribute.
+        self.stop_moving_current_block()
+
     def _check_line_completion(self):
         """
         Check each line of the grid and remove the ones that
@@ -452,6 +460,10 @@ def main():
             if not game_start:
                 if event.type == pygame.KEYUP and event.key == pygame.K_s:
                     game_start = True
+                    #* Starts a new game
+                    if game_over:
+                        game_over = False
+                        blocks = BlocksGroup()
                     blocks._create_new_block()
                 elif event.type == pygame.QUIT:
                     run = False
@@ -544,8 +556,12 @@ def main():
             inst_text3 = font.render("← and → to move", True, (255, 255, 255), bgcolor)
             inst_text4 = font.render("↓ to drop quickly", True, (255, 255, 255), bgcolor)
         else:
-            inst_text = font.render("Press (S) to start", True, (255, 255, 255), bgcolor)
-            inst_text2 = font.render("Press (Q) to Quit", True, (255, 255, 255), bgcolor)
+            if not game_over:
+                inst_text = font.render("Press (S) to start", True, (255, 255, 255), bgcolor)
+                inst_text2 = font.render("Press (Q) to Quit", True, (255, 255, 255), bgcolor)
+            else:
+                inst_text = font.render("(S) for new game", True, (255, 255, 255), bgcolor)
+                inst_text2 = font.render("Press (Q) to Quit", True, (255, 255, 255), bgcolor)
         
         score_text = font.render(f"Score: {blocks.score}", True, (255, 255, 255), bgcolor)    
         score = blocks.score
@@ -562,6 +578,7 @@ def main():
             draw_centered_surface(screen, inst_text4, 370)
         if game_over:
             draw_centered_surface(screen, game_over_text, 360)
+            game_start = False
         # Update.
         pygame.display.flip()
 
