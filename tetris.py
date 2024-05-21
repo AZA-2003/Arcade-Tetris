@@ -434,12 +434,14 @@ def main():
     EVENT_MOVE_CURRENT_BLOCK = pygame.USEREVENT + 2
     EVENT_UPDATE_DIFF2 = pygame.USEREVENT + 3
     EVENT_UPDATE_DIFF3 = pygame.USEREVENT + 4
+    EVENT_UPDATE_DIFF4 = pygame.USEREVENT + 5
     # Speed at which blocks update and move
     # Lower number means faster
-    pygame.time.set_timer(EVENT_UPDATE_CURRENT_BLOCK, 1000)
-    pygame.time.set_timer(EVENT_MOVE_CURRENT_BLOCK, 80)
-    pygame.time.set_timer(EVENT_UPDATE_DIFF2, 500)
+    pygame.time.set_timer(EVENT_UPDATE_CURRENT_BLOCK, 500)
+    pygame.time.set_timer(EVENT_MOVE_CURRENT_BLOCK, 70)
+    pygame.time.set_timer(EVENT_UPDATE_DIFF2, 400)
     pygame.time.set_timer(EVENT_UPDATE_DIFF3, 200)
+    pygame.time.set_timer(EVENT_UPDATE_DIFF4, 100)
 
     blocks = BlocksGroup()
 
@@ -490,20 +492,23 @@ def main():
 
             try:
                 #* Need to coincide with the update periods 
-                #* curr difficulties have periods 1000, 500, 200
-                # (so multiples of 5, 10, 2)
+                #* curr difficulties have periods 500, 400, 200, 100
+                # (so multiples of 5, 4, 2, 1)
                 
                 if event.type == EVENT_MOVE_CURRENT_BLOCK:
                     blocks.move_current_block()
                 else:
-                    if score < 40:
+                    if score < 10:
                         if event.type == EVENT_UPDATE_CURRENT_BLOCK:
                             blocks.update_current_block()
-                    elif score < 80:
+                    elif score < 30:
                         if event.type == EVENT_UPDATE_DIFF2:
                             blocks.update_current_block()
-                    else:
+                    elif score < 70:
                         if event.type == EVENT_UPDATE_DIFF3:
+                            blocks.update_current_block()
+                    else:
+                        if event.type == EVENT_UPDATE_DIFF4:
                             blocks.update_current_block()
                 
             except TopReached:
