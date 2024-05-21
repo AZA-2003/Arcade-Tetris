@@ -170,6 +170,16 @@ class Block(pygame.sprite.Sprite):
             self.y -= 1
             self.current = False
             raise BottomReached
+        
+    def move_bottom(self, group):
+        # Move to bottom of grid
+        while True:
+            self.y += 1
+            if self.rect.bottom > GRID_HEIGHT or Block.collide(self, group):
+                # Rollback to the previous position.
+                self.y -= 1
+                self.current = False
+                raise BottomReached
 
 
     def rotate(self, group):
@@ -349,7 +359,8 @@ class BlocksGroup(pygame.sprite.OrderedUpdates):
         if self._current_block_movement_heading is None:
             return
         action = {
-            pygame.K_DOWN: self.current_block.move_down,
+            # pygame.K_DOWN: self.current_block.move_down,
+            pygame.K_DOWN: self.current_block.move_bottom,
             pygame.K_LEFT: self.current_block.move_left,
             pygame.K_RIGHT: self.current_block.move_right
         }
