@@ -472,6 +472,7 @@ def main():
                         game_over = False
                         blocks = BlocksGroup()
                     blocks._create_new_block()
+                    game_timer.start()
                 elif event.type == pygame.QUIT:
                     run = False
                     break
@@ -496,6 +497,10 @@ def main():
                         blocks.rotate_current_block()
                 if event.key == pygame.K_p:
                     paused = not paused
+                    if paused == True:
+                        game_timer.pause()
+                    else:
+                        game_timer.resume()
 
             # Stop moving blocks if the game is over or paused.
             if game_over or paused:
@@ -574,6 +579,10 @@ def main():
             game_start = False
         # Update.
         pygame.display.flip()
+        
+        if run == False:
+            played_for = game_timer.stop()
+            print(f"Played for {played_for} seconds")
 
     pygame.quit()
 
