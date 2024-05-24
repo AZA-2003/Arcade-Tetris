@@ -7,6 +7,7 @@
 
 from collections import OrderedDict
 import random
+from timer import Timer
 
 from pygame import Rect
 import pygame
@@ -423,6 +424,8 @@ def main():
     game_start = False
     game_over = False
     score = 0
+    time_lim = 30.0
+    game_timer = Timer()
     
     # Create background.
     background = pygame.Surface(screen.get_size())
@@ -463,6 +466,7 @@ def main():
             if not game_start:
                 if event.type == pygame.KEYUP and event.key == pygame.K_s:
                     game_start = True
+                    
                     #* Starts a new game
                     if game_over:
                         game_over = False
