@@ -426,6 +426,7 @@ def main():
     score = 0
     time_lim = 30.0
     game_timer = Timer()
+    timer_res = 1.0
     
     # Create background.
     background = pygame.Surface(screen.get_size())
@@ -533,6 +534,7 @@ def main():
                 
             except TopReached:
                 game_over = True
+                            
 
         # Draw background and grid.
         screen.blit(background, (0, 0))        
@@ -574,11 +576,16 @@ def main():
             # Current font size 20, so should be enough
             draw_centered_surface(screen, inst_text3, 340)
             draw_centered_surface(screen, inst_text4, 370)
+            
+            timer_res = time_lim + 3 / 5 * score - game_timer.getTime()
         if game_over:
             draw_centered_surface(screen, game_over_text, 360)
             game_start = False
         # Update.
-        pygame.display.flip()
+        pygame.display.flip()        
+        
+        if timer_res <= 0.0:
+            game_over = True
         
         if run == False:
             played_for = game_timer.stop()
