@@ -424,7 +424,7 @@ def main():
     game_start = False
     game_over = False
     score = 0
-    time_lim = 30.0
+    time_lim = 40.0
     game_timer = Timer()
     timer_res = 1.0
     
@@ -548,7 +548,7 @@ def main():
         
         if game_start:
             timer_res = time_lim + 3 / 5 * score - game_timer.getTime()
-            time_text = font.render(f"Remaining time: {int(timer_res)}", True, (255, 255, 255), bgcolor)
+            time_text = font.render(f"Remaining time: {int(timer_res)}", True, (255, 255, 0), bgcolor)
             if not paused:
                 inst_text = font.render("(P) to pause", True, (255, 255, 255), bgcolor)
                 inst_text2 = font.render("↑ to rotate", True, (255, 255, 255), bgcolor)
@@ -576,7 +576,7 @@ def main():
             draw_centered_surface(screen, next_block_text, 50)
             
             # Current font size 20, so should be enough
-            draw_centered_surface(screen, time_text, 330)
+            draw_centered_surface(screen, time_text, 340)
             draw_centered_surface(screen, inst_text3, 370)
             draw_centered_surface(screen, inst_text4, 400)
                         
