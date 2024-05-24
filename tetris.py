@@ -7,6 +7,7 @@
 
 from collections import OrderedDict
 import random
+from timer import Timer
 
 from pygame import Rect
 import pygame
@@ -170,6 +171,16 @@ class Block(pygame.sprite.Sprite):
             self.y -= 1
             self.current = False
             raise BottomReached
+        
+    def move_bottom(self, group):
+        # Move to bottom of grid
+        while True:
+            self.y += 1
+            if self.rect.bottom > GRID_HEIGHT or Block.collide(self, group):
+                # Rollback to the previous position.
+                self.y -= 1
+                self.current = False
+                raise BottomReached
 
 
     def rotate(self, group):
@@ -349,7 +360,8 @@ class BlocksGroup(pygame.sprite.OrderedUpdates):
         if self._current_block_movement_heading is None:
             return
         action = {
-            pygame.K_DOWN: self.current_block.move_down,
+            # pygame.K_DOWN: self.current_block.move_down,
+            pygame.K_DOWN: self.current_block.move_bottom,
             pygame.K_LEFT: self.current_block.move_left,
             pygame.K_RIGHT: self.current_block.move_right
         }
@@ -412,6 +424,9 @@ def main():
     game_start = False
     game_over = False
     score = 0
+    time_lim = 30.0
+    game_timer = Timer()
+    timer_res = 1.0
     
     # Create background.
     background = pygame.Surface(screen.get_size())
@@ -434,12 +449,14 @@ def main():
     EVENT_MOVE_CURRENT_BLOCK = pygame.USEREVENT + 2
     EVENT_UPDATE_DIFF2 = pygame.USEREVENT + 3
     EVENT_UPDATE_DIFF3 = pygame.USEREVENT + 4
+    EVENT_UPDATE_DIFF4 = pygame.USEREVENT + 5
     # Speed at which blocks update and move
     # Lower number means faster
-    pygame.time.set_timer(EVENT_UPDATE_CURRENT_BLOCK, 1000)
-    pygame.time.set_timer(EVENT_MOVE_CURRENT_BLOCK, 80)
-    pygame.time.set_timer(EVENT_UPDATE_DIFF2, 500)
+    pygame.time.set_timer(EVENT_UPDATE_CURRENT_BLOCK, 500)
+    pygame.time.set_timer(EVENT_MOVE_CURRENT_BLOCK, 70)
+    pygame.time.set_timer(EVENT_UPDATE_DIFF2, 400)
     pygame.time.set_timer(EVENT_UPDATE_DIFF3, 200)
+    pygame.time.set_timer(EVENT_UPDATE_DIFF4, 100)
 
     blocks = BlocksGroup()
 
@@ -450,11 +467,13 @@ def main():
             if not game_start:
                 if event.type == pygame.KEYUP and event.key == pygame.K_s:
                     game_start = True
+                    
                     #* Starts a new game
                     if game_over:
                         game_over = False
                         blocks = BlocksGroup()
                     blocks._create_new_block()
+                    game_timer.start()
                 elif event.type == pygame.QUIT:
                     run = False
                     break
@@ -479,6 +498,10 @@ def main():
                         blocks.rotate_current_block()
                 if event.key == pygame.K_p:
                     paused = not paused
+                    if paused == True:
+                        game_timer.pause()
+                    else:
+                        game_timer.resume()
 
             # Stop moving blocks if the game is over or paused.
             if game_over or paused:
@@ -490,24 +513,28 @@ def main():
 
             try:
                 #* Need to coincide with the update periods 
-                #* curr difficulties have periods 1000, 500, 200
-                # (so multiples of 5, 10, 2)
+                #* curr difficulties have periods 500, 400, 200, 100
+                # (so multiples of 5, 4, 2, 1)
                 
                 if event.type == EVENT_MOVE_CURRENT_BLOCK:
                     blocks.move_current_block()
                 else:
-                    if score < 40:
+                    if score < 10:
                         if event.type == EVENT_UPDATE_CURRENT_BLOCK:
                             blocks.update_current_block()
-                    elif score < 80:
+                    elif score < 30:
                         if event.type == EVENT_UPDATE_DIFF2:
                             blocks.update_current_block()
-                    else:
+                    elif score < 70:
                         if event.type == EVENT_UPDATE_DIFF3:
+                            blocks.update_current_block()
+                    else:
+                        if event.type == EVENT_UPDATE_DIFF4:
                             blocks.update_current_block()
                 
             except TopReached:
                 game_over = True
+                            
 
         # Draw background and grid.
         screen.blit(background, (0, 0))        
@@ -549,11 +576,20 @@ def main():
             # Current font size 20, so should be enough
             draw_centered_surface(screen, inst_text3, 340)
             draw_centered_surface(screen, inst_text4, 370)
+            
+            timer_res = time_lim + 3 / 5 * score - game_timer.getTime()
         if game_over:
             draw_centered_surface(screen, game_over_text, 360)
             game_start = False
         # Update.
-        pygame.display.flip()
+        pygame.display.flip()        
+        
+        if timer_res <= 0.0:
+            game_over = True
+        
+        if run == False:
+            played_for = game_timer.stop()
+            print(f"Played for {played_for} seconds")
 
     pygame.quit()
 
