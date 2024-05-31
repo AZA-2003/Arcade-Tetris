@@ -471,9 +471,6 @@ def main():
                 elif event.type == pygame.QUIT:
                     run = False
                     break
-                elif event.type == pygame.KEYUP and event.key == pygame.K_q:
-                    run = False
-                    break
                 
                 continue            
             
@@ -532,19 +529,17 @@ def main():
             # Loading screen before game start
             if not game_over:
                 inst_text = font.render("Press (S) to start", True, (255, 255, 255), bgcolor)
-                inst_text2 = font.render("Press (Q) to Quit", True, (255, 255, 255), bgcolor)
             # Game over scenario
             else:
                 inst_text = font.render("(S) for new game", True, (255, 255, 255), bgcolor)
-                inst_text2 = font.render("Press (Q) to Quit", True, (255, 255, 255), bgcolor)
         
         score_text = font.render(f"Score: {blocks.score}", True, (255, 255, 255), bgcolor)    
         score = blocks.score
         
         draw_centered_surface(screen, score_text, 240)
         draw_centered_surface(screen, inst_text, 280)
-        draw_centered_surface(screen, inst_text2, 310)
         if game_start:
+            draw_centered_surface(screen, inst_text2, 310)
             draw_centered_surface(screen, blocks.next_block.image, 100)
             draw_centered_surface(screen, next_block_text, 50)
             
