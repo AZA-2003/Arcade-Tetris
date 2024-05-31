@@ -519,7 +519,7 @@ def main():
         game_over_text = font_game_over.render("|Game over!|", True, (255, 220, 0), bgcolor)
         
         if game_start:
-            timer_res = time_lim + 3 / 5 * score - game_timer.getTime()
+            timer_res = time_lim + 2 / 5 * score - game_timer.getTime()
             time_text = font.render(f"Remaining time: {int(timer_res)}", True, (255, 255, 0), bgcolor)            
             inst_text = font.render("5 points & 3 secs per row", True, (255, 255, 255), bgcolor)
             inst_text2 = font.render("↑ to rotate", True, (255, 255, 255), bgcolor)
