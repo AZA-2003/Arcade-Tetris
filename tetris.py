@@ -507,19 +507,10 @@ def main():
                 
                 if event.type == EVENT_MOVE_CURRENT_BLOCK:
                     blocks.move_current_block()
-                else:
-                    if score < 10:
-                        if event.type == EVENT_UPDATE_CURRENT_BLOCK:
-                            blocks.update_current_block()
-                    elif score < 30:
-                        if event.type == EVENT_UPDATE_DIFF2:
-                            blocks.update_current_block()
-                    elif score < 70:
-                        if event.type == EVENT_UPDATE_DIFF3:
-                            blocks.update_current_block()
-                    else:
-                        if event.type == EVENT_UPDATE_DIFF4:
-                            blocks.update_current_block()
+                else:                    
+                    if event.type == EVENT_UPDATE_DIFF3:
+                        blocks.update_current_block()
+                    
                 
             except TopReached:
                 game_over = True
