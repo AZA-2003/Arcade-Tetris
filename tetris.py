@@ -423,7 +423,7 @@ def main():
     game_start = False
     game_over = False
     score = 0
-    time_lim = 40.0
+    time_lim = 120.0
     game_timer = Timer()
     timer_res = 1.0
     
