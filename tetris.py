@@ -420,7 +420,6 @@ def main():
     pygame.display.set_caption("Sample Tetris with PyGame")
     screen = pygame.display.set_mode((WIN_WIDTH, WIN_HEIGHT))
     run = True
-    paused = False
     game_start = False
     game_over = False
     score = 0
@@ -481,30 +480,20 @@ def main():
                     run = False
                     break
                 
-                continue
-            
-            if paused and event.type == pygame.KEYUP and event.key == pygame.K_q:
-                run = False
-                break
+                continue            
             
             if event.type == pygame.QUIT:
                 run = False
                 break
             elif event.type == pygame.KEYUP:
-                if not paused and not game_over:
+                if not game_over:
                     if event.key in MOVEMENT_KEYS:
                         blocks.stop_moving_current_block()
                     elif event.key == pygame.K_UP:
                         blocks.rotate_current_block()
-                if event.key == pygame.K_p:
-                    paused = not paused
-                    if paused == True:
-                        game_timer.pause()
-                    else:
-                        game_timer.resume()
 
-            # Stop moving blocks if the game is over or paused.
-            if game_over or paused:
+            # Stop moving blocks if the game is over
+            if game_over:
                 continue
 
             if event.type == pygame.KEYDOWN:
@@ -548,13 +537,9 @@ def main():
         
         if game_start:
             timer_res = time_lim + 3 / 5 * score - game_timer.getTime()
-            time_text = font.render(f"Remaining time: {int(timer_res)}", True, (255, 255, 0), bgcolor)
-            if not paused:
-                inst_text = font.render("(P) to pause", True, (255, 255, 255), bgcolor)
-                inst_text2 = font.render("↑ to rotate", True, (255, 255, 255), bgcolor)
-            else:
-                inst_text = font.render("(P) to resume", True, (255, 255, 255), bgcolor)
-                inst_text2 = font.render("(Q) to Quit", True, (255, 255, 255), bgcolor)
+            time_text = font.render(f"Remaining time: {int(timer_res)}", True, (255, 255, 0), bgcolor)            
+            inst_text = font.render("5 points & 3 secs per row", True, (255, 255, 255), bgcolor)
+            inst_text2 = font.render("↑ to rotate", True, (255, 255, 255), bgcolor)
             inst_text3 = font.render("← and → to move", True, (255, 255, 255), bgcolor)
             inst_text4 = font.render("↓ to drop quickly", True, (255, 255, 255), bgcolor)
         else:
