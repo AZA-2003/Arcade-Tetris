@@ -424,7 +424,7 @@ def main():
     game_start = False
     game_over = False
     score = 0
-    time_lim = 30.0
+    time_lim = 40.0
     game_timer = Timer()
     timer_res = 1.0
     
@@ -547,6 +547,8 @@ def main():
         game_over_text = font_game_over.render("|Game over!|", True, (255, 220, 0), bgcolor)
         
         if game_start:
+            timer_res = time_lim + 3 / 5 * score - game_timer.getTime()
+            time_text = font.render(f"Remaining time: {int(timer_res)}", True, (255, 255, 0), bgcolor)
             if not paused:
                 inst_text = font.render("(P) to pause", True, (255, 255, 255), bgcolor)
                 inst_text2 = font.render("↑ to rotate", True, (255, 255, 255), bgcolor)
@@ -556,9 +558,11 @@ def main():
             inst_text3 = font.render("← and → to move", True, (255, 255, 255), bgcolor)
             inst_text4 = font.render("↓ to drop quickly", True, (255, 255, 255), bgcolor)
         else:
+            # Loading screen before game start
             if not game_over:
                 inst_text = font.render("Press (S) to start", True, (255, 255, 255), bgcolor)
                 inst_text2 = font.render("Press (Q) to Quit", True, (255, 255, 255), bgcolor)
+            # Game over scenario
             else:
                 inst_text = font.render("(S) for new game", True, (255, 255, 255), bgcolor)
                 inst_text2 = font.render("Press (Q) to Quit", True, (255, 255, 255), bgcolor)
@@ -574,10 +578,10 @@ def main():
             draw_centered_surface(screen, next_block_text, 50)
             
             # Current font size 20, so should be enough
-            draw_centered_surface(screen, inst_text3, 340)
-            draw_centered_surface(screen, inst_text4, 370)
-            
-            timer_res = time_lim + 3 / 5 * score - game_timer.getTime()
+            draw_centered_surface(screen, time_text, 340)
+            draw_centered_surface(screen, inst_text3, 370)
+            draw_centered_surface(screen, inst_text4, 400)
+                        
         if game_over:
             draw_centered_surface(screen, game_over_text, 360)
             game_start = False
