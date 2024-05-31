@@ -444,18 +444,13 @@ def main():
         font_game_over = pygame.font.Font(pygame.font.get_default_font(), 40)
 
     MOVEMENT_KEYS = pygame.K_LEFT, pygame.K_RIGHT, pygame.K_DOWN
-    EVENT_UPDATE_CURRENT_BLOCK = pygame.USEREVENT + 1
+    EVENT_UPDATE_DIFF1 = pygame.USEREVENT + 1
     EVENT_MOVE_CURRENT_BLOCK = pygame.USEREVENT + 2
-    EVENT_UPDATE_DIFF2 = pygame.USEREVENT + 3
     EVENT_UPDATE_DIFF3 = pygame.USEREVENT + 4
-    EVENT_UPDATE_DIFF4 = pygame.USEREVENT + 5
     # Speed at which blocks update and move
     # Lower number means faster
-    pygame.time.set_timer(EVENT_UPDATE_CURRENT_BLOCK, 500)
+    pygame.time.set_timer(EVENT_UPDATE_DIFF1, 180)
     pygame.time.set_timer(EVENT_MOVE_CURRENT_BLOCK, 70)
-    pygame.time.set_timer(EVENT_UPDATE_DIFF2, 400)
-    pygame.time.set_timer(EVENT_UPDATE_DIFF3, 200)
-    pygame.time.set_timer(EVENT_UPDATE_DIFF4, 100)
 
     blocks = BlocksGroup()
 
@@ -508,7 +503,7 @@ def main():
                 if event.type == EVENT_MOVE_CURRENT_BLOCK:
                     blocks.move_current_block()
                 else:                    
-                    if event.type == EVENT_UPDATE_DIFF3:
+                    if event.type == EVENT_UPDATE_DIFF1:
                         blocks.update_current_block()
                     
                 
