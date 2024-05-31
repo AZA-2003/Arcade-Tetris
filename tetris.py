@@ -558,9 +558,11 @@ def main():
             inst_text3 = font.render("← and → to move", True, (255, 255, 255), bgcolor)
             inst_text4 = font.render("↓ to drop quickly", True, (255, 255, 255), bgcolor)
         else:
+            # Loading screen before game start
             if not game_over:
                 inst_text = font.render("Press (S) to start", True, (255, 255, 255), bgcolor)
                 inst_text2 = font.render("Press (Q) to Quit", True, (255, 255, 255), bgcolor)
+            # Game over scenario
             else:
                 inst_text = font.render("(S) for new game", True, (255, 255, 255), bgcolor)
                 inst_text2 = font.render("Press (Q) to Quit", True, (255, 255, 255), bgcolor)
